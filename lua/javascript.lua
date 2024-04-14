@@ -1,5 +1,6 @@
 local javascript = {}
 local utils = require'utils'
+local TYPES = utils.TYPES
 
 javascript.context = function(opts, bufnr)
 	local ns_id = vim.api.nvim_create_namespace('closing-context')
@@ -24,7 +25,7 @@ javascript.context = function(opts, bufnr)
 		local keyword = get_text(variable_delcaration_node[2])
 		keyword = utils.split_string(keyword, " ")[1]
 		local variable_name = get_text(variable_delcaration_node[1])
-		utils.write_vtext(opts, bufnr, ns_id, variable_delcaration_node[2], keyword, variable_name)
+		utils.write_vtext(TYPES.VARIABLE, opts, bufnr, ns_id, variable_delcaration_node[2], keyword, variable_name)
 	end
 
 	-- function declaration
@@ -34,9 +35,9 @@ javascript.context = function(opts, bufnr)
 		) @function_declaration
 	]])
 
-	for _, variable_delcaration_node in query:iter_matches(root, bufnr, 0, -1) do
-		local function_name = get_text(variable_delcaration_node[1])
-		utils.write_vtext(opts, bufnr, ns_id, variable_delcaration_node[2], 'function', function_name)
+	for _, function_declaration_node in query:iter_matches(root, bufnr, 0, -1) do
+		local function_name = get_text(function_declaration_node[1])
+		utils.write_vtext(TYPES.FUNCTION, opts, bufnr, ns_id, function_declaration_node[2], 'function', function_name)
 	end
 
 	-- switch statement
@@ -48,7 +49,7 @@ javascript.context = function(opts, bufnr)
 
 	for _, switch_node in query:iter_matches(root, bufnr, 0, -1) do
 		local switch_condition = get_text(switch_node[1])
-		utils.write_vtext(opts, bufnr, ns_id, switch_node[2], 'switch', switch_condition)
+		utils.write_vtext(TYPES.SWITCH, opts, bufnr, ns_id, switch_node[2], 'switch', switch_condition)
 	end
 
 	-- while statement
@@ -60,7 +61,7 @@ javascript.context = function(opts, bufnr)
 
 	for _, while_node in query:iter_matches(root, bufnr, 0, -1) do
 		local condition = get_text(while_node[1])
-		utils.write_vtext(opts, bufnr, ns_id, while_node[2], 'while', condition)
+		utils.write_vtext(TYPES.WHILE, opts, bufnr, ns_id, while_node[2], 'while', condition)
 	end
 
 	-- if statement
@@ -106,15 +107,8 @@ javascript.context = function(opts, bufnr)
 				end
 				child_node = child_node:next_named_sibling()
 			end
-			-- for _, else_node in else_query:iter_matches(if_node[2], bufnr, 0, -1) do
-			-- 	if else_node[3] ~= nil then
-			-- 		else_info = else_info .. ", else if " .. get_text(else_node[2])
-			-- 	else
-			-- 		else_info = else_info .. ", else {}"
-			-- 	end
-			-- end
 			local if_condition = get_text(if_node[1]) .. else_info
-			utils.write_vtext(opts, bufnr, ns_id, if_node[2], 'if', if_condition)
+			utils.write_vtext(TYPES.IF, opts, bufnr, ns_id, if_node[2], 'if', if_condition)
 		end
 	end
 
@@ -132,7 +126,7 @@ javascript.context = function(opts, bufnr)
 		local condition = get_text(for_node[2])
 		local increment = get_text(for_node[3])
 		local parenthesis_text = "(" .. initializer .. " " .. condition .. " " .. increment .. ")"
-		utils.write_vtext(opts, bufnr, ns_id, for_node[4], 'for', parenthesis_text)
+		utils.write_vtext(TYPES.FOR, opts, bufnr, ns_id, for_node[4], 'for', parenthesis_text)
 	end
 end
 

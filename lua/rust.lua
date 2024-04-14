@@ -1,5 +1,6 @@
 local rust = {}
 local utils = require'utils'
+local TYPES = utils.TYPES
 
 rust.context = function(opts, bufnr)
 	local ns_id = vim.api.nvim_create_namespace('closing-context')
@@ -20,7 +21,7 @@ rust.context = function(opts, bufnr)
 
 	for _, fn_node in query:iter_matches(root, bufnr, 0, -1) do
 		local fn_name = get_text(fn_node[1])
-		utils.write_vtext(opts, bufnr, ns_id, fn_node[2], 'fn', fn_name)
+		utils.write_vtext(TYPES.FUNCTION, opts, bufnr, ns_id, fn_node[2], 'fn', fn_name)
 	end
 
 	-- add while <condition> to end of while block
@@ -32,7 +33,7 @@ rust.context = function(opts, bufnr)
 
 	for _, while_node in query:iter_matches(root, bufnr, 0, -1) do
 		local condition = get_text(while_node[1])
-		utils.write_vtext(opts, bufnr, ns_id, while_node[2], 'while', condition)
+		utils.write_vtext(TYPES.WHILE, opts, bufnr, ns_id, while_node[2], 'while', condition)
 	end
 
 	-- compile if statements and display on last line
@@ -46,7 +47,7 @@ rust.context = function(opts, bufnr)
 		-- make sure it's a standalone block and not used for variable declaration
 		if if_node[2]:parent():type() ~= "let_declaration" then
 			local condition = get_text(if_node[1])
-			utils.write_vtext(opts, bufnr, ns_id, if_node[2], 'if', condition)
+			utils.write_vtext(TYPES.IF, opts, bufnr, ns_id, if_node[2], 'if', condition)
 		end
 	end
 
@@ -61,7 +62,7 @@ rust.context = function(opts, bufnr)
 		-- make sure it's a standalone block and not used for variable declaration
 		if match_node[2]:parent():type() ~= "let_declaration" then
 			local condition = get_text(match_node[1])
-			utils.write_vtext(opts, bufnr, ns_id, match_node[2], 'match', condition)
+			utils.write_vtext(TYPES.MATCH, opts, bufnr, ns_id, match_node[2], 'match', condition)
 		end
 	end
 
@@ -74,7 +75,7 @@ rust.context = function(opts, bufnr)
 	
 	for _, let_node in query:iter_matches(root, bufnr, 0, -1) do
 		local pattern = get_text(let_node[1])
-		utils.write_vtext(opts, bufnr, ns_id, let_node[2], 'let', pattern)
+		utils.write_vtext(TYPES.VARIABLE, opts, bufnr, ns_id, let_node[2], 'let', pattern)
 	end
 end
 

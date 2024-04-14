@@ -1,10 +1,25 @@
 local utils = {}
 
+-- enum for keyword types
+utils.TYPES = {
+	VARIABLE = 'VARIABLE',
+	FUNCTION = 'FUNCTION',
+	FOR = 'FOR',
+	SWITCH = 'SWITCH',
+	WHILE = 'WHILE',
+	IF = 'IF',
+	MATCH = 'MATCH',
+}
+
 utils.inspect = function(value)
 	print(vim.inspect(value))
 end
 
-utils.write_vtext = function(opts, bufnr, ns_id, block_node, keyword, condition)
+utils.write_vtext = function(type, opts, bufnr, ns_id, block_node, keyword, condition)
+	if opts[type] ~= nil then
+		opts = opts[type]
+	end
+
 	local end_coordinates = {block_node:range()}
 	-- don't print if 1 line
 	if end_coordinates[1] == end_coordinates[3] then

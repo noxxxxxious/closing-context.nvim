@@ -12,6 +12,18 @@ M.setup = function(opts)
 			display = true,
 			show_keywords = true,
 			descriptor_length = 0,
+		},
+		FUNCTION = {
+			current_line_opts = {
+				display = true,
+				show_keywords = true,
+				descriptor_length = -1,
+			},
+			other_line_opts = {
+				display = true,
+				show_keywords = true,
+				descriptor_length = -1,
+			},
 		}
 	}
 
@@ -29,6 +41,8 @@ M.write_context = function(opts)
 		require'rust'.context(opts, bufnr)
 	elseif filetype == "javascript" then
 		require'javascript'.context(opts, bufnr)
+	elseif filetype == "lua" then
+		require'lua'.context(opts, bufnr)
 	end
 end
 
