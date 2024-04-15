@@ -4,7 +4,7 @@ local utils = require'utils'
 M.setup = function(opts)
 	local DEFAULT_OPTS = {
 		current_line_opts = {
-			display = true,
+			display = true, --whether or not to display the text
 			show_keywords = true, --whether to show keywords like if, let, match, etc
 			descriptor_length = -1, --how many characters of a condition to show. e.g. if <<a == b>>
 		},
@@ -24,7 +24,19 @@ M.setup = function(opts)
 				show_keywords = true,
 				descriptor_length = -1,
 			},
-		}
+		},
+		VARIABLE = {
+			current_line_opts = {
+				display = true,
+				show_keywords = true,
+				descriptor_length = -1,
+			},
+			other_line_opts = {
+				display = true,
+				show_keywords = true,
+				descriptor_length = -1,
+			},
+		},
 	}
 
 	M.config = vim.tbl_deep_extend('force', DEFAULT_OPTS, opts or {})
@@ -62,7 +74,7 @@ end
 vim.api.nvim_create_autocmd({
 	'BufWritePost', 'BufReadPost', 'BufEnter', 'BufWinEnter',
 	'CursorMoved', 'TabEnter', 'TextChanged', 'TextChangedI' }, {
-	pattern = {"*.html", "*.rs", "*.js"},
+	pattern = {"*.html", "*.rs", "*.js", "*.lua"},
 	command = "lua require'closing-context'.rewrite_context()",
 })
 
@@ -89,3 +101,4 @@ vim.api.nvim_create_user_command('ClosingContext', M.command_handler, {
 })
 
 return M
+
