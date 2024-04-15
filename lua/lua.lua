@@ -79,6 +79,7 @@ lua.context = function(opts, bufnr)
 		(for_statement
 			clause: (_
 				(expression_list) @condition
+			)
 		) @for_statement
 	]])
 
