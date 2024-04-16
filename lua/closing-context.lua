@@ -1,39 +1,26 @@
 local M = {}
 local utils = require'utils'
+local TYPES = utils.TYPES
 
 M.setup = function(opts)
 	local DEFAULT_OPTS = {
-		current_line_opts = {
+		current_line = {
 			display = true, --whether or not to display the text
 			show_keywords = true, --whether to show keywords like if, let, match, etc
 			descriptor_length = -1, --how many characters of a condition to show. e.g. if <<a == b>>
 		},
-		other_line_opts = {
+		other_line = {
 			display = true,
 			show_keywords = true,
 			descriptor_length = 0,
 		},
 		FUNCTION = {
-			current_line_opts = {
-				display = true,
-				show_keywords = true,
-				descriptor_length = -1,
-			},
-			other_line_opts = {
-				display = true,
-				show_keywords = true,
+			other_line = {
 				descriptor_length = -1,
 			},
 		},
 		VARIABLE = {
-			current_line_opts = {
-				display = true,
-				show_keywords = true,
-				descriptor_length = -1,
-			},
-			other_line_opts = {
-				display = true,
-				show_keywords = true,
+			other_line = {
 				descriptor_length = -1,
 			},
 		},
@@ -41,8 +28,35 @@ M.setup = function(opts)
 
 	M.config = vim.tbl_deep_extend('force', DEFAULT_OPTS, opts or {})
 
+	local defaults = {
+		current_line = {},
+		other_line = {},
+	}
+
+	defaults.current_line = DEFAULT_OPTS.current_line
+	defaults.other_line = DEFAULT_OPTS.other_line
+
+	-- expand base keyword options
+	for key, _ in pairs(M.config) do
+		if TYPES[key] ~= nil then
+			M.config[key].current_line = vim.tbl_extend('force', defaults.current_line, M.config[key].current_line or {})
+			M.config[key].other_line = vim.tbl_extend('force', defaults.other_line, M.config[key].other_line or {})
+			defaults[key] = M.config[key]
+		end
+	end
+
+	-- expand lanauge specific options
+	for key, config in pairs(M.config) do
+		if TYPES[key] == nil and key ~= "current_line" and key ~= "other_line" then
+			M.config[key] = vim.tbl_deep_extend('force', defaults, config or {})
+		end
+	end
+
+	print(vim.inspect(M.config))
+
 	require'closing-context'.write_context(M.config)
 end
+
 
 M.write_context = function(opts)
 	local bufnr = vim.api.nvim_get_current_buf()

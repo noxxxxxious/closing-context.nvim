@@ -16,6 +16,14 @@ utils.inspect = function(value)
 end
 
 utils.write_vtext = function(type, opts, bufnr, ns_id, block_node, keyword, condition)
+
+	-- use specific filetype options if exists
+	local filetype = vim.bo[bufnr].filetype
+	if opts[filetype] ~= nil then
+		opts = opts[filetype]
+	end
+
+	-- use specific keyword options if exists
 	if opts[type] ~= nil then
 		opts = opts[type]
 	end
@@ -29,9 +37,9 @@ utils.write_vtext = function(type, opts, bufnr, ns_id, block_node, keyword, cond
 	-- get cursor line to see which set of options to use
 	local cursor_line = vim.api.nvim_win_get_cursor(0)[1] - 1
 	if cursor_line == end_coordinates[3] then
-		opts = opts.current_line_opts
+		opts = opts.current_line
 	else
-		opts = opts.other_line_opts
+		opts = opts.other_line
 	end
 
 	if opts.display == false then
