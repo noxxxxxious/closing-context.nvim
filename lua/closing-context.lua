@@ -16,12 +16,12 @@ M.setup = function(opts)
 		},
 		FUNCTION = {
 			other_line = {
-				descriptor_length = -1,
+				descriptor_length = -1, --this will override the base other_line to show the function names at all times
 			},
 		},
 		VARIABLE = {
 			other_line = {
-				descriptor_length = -1,
+				descriptor_length = -1, --this will override the base other_line to show variable names at all times
 			},
 		},
 	}
