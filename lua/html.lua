@@ -42,29 +42,32 @@ html.context = function(opts, bufnr)
 	]])
 
 	for _, html_node in tag_with_attributes_query:iter_matches(root, bufnr, 0, -1) do
-		-- Get the attributes and format them into a css selector
-		local selector_text = ""
-		for _, attribute_node in attributes_query:iter_matches(html_node[1], bufnr, 0, -1) do
-			local an1 = get_text(attribute_node[1])
-			local an2 = get_text(attribute_node[2])
-			if an1 == "id" then
-				selector_text = "#" .. an2 .. selector_text
-			elseif an1 == "class" then
-				local split_classes = split_string(an2, " ")
-				for _, class_string in ipairs(split_classes) do
-					selector_text = selector_text .. "." .. class_string
-				end
-			else
-				selector_text = selector_text .. "[" .. an1 .. "=\"" .. an2 .. "\"]"
-			end
-		end
-
-		-- Get the last letter of the end tag before the closing bracket and draw virtual text
+		local start_tag_range = {html_node[1]:range()}
 		local end_tag_range = {html_node[2]:range()}
-		vim.api.nvim_buf_set_extmark(bufnr, ns_id, end_tag_range[3], end_tag_range[4], {
-			virt_text = {{selector_text, 'Comment'}},
-			virt_text_pos = 'inline',
-		})
+		print(vim.inspect(start_tag_range) .. " " .. vim.inspect(end_tag_range))
+		if start_tag_range[3] ~= end_tag_range[3] then
+			-- Get the attributes and format them into a css selector
+			local selector_text = ""
+			for _, attribute_node in attributes_query:iter_matches(html_node[1], bufnr, 0, -1) do
+				local an1 = get_text(attribute_node[1])
+				local an2 = get_text(attribute_node[2])
+				if an1 == "id" then
+					selector_text = "#" .. an2 .. selector_text
+				elseif an1 == "class" then
+					local split_classes = split_string(an2, " ")
+					for _, class_string in ipairs(split_classes) do
+						selector_text = selector_text .. "." .. class_string
+					end
+				else
+					selector_text = selector_text .. "[" .. an1 .. "=\"" .. an2 .. "\"]"
+				end
+			end
+
+			vim.api.nvim_buf_set_extmark(bufnr, ns_id, end_tag_range[3], end_tag_range[4], {
+				virt_text = {{selector_text, 'Comment'}},
+				virt_text_pos = 'inline',
+			})
+		end
 	end
 end
 

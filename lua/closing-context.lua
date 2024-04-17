@@ -52,8 +52,6 @@ M.setup = function(opts)
 		end
 	end
 
-	print(vim.inspect(M.config))
-
 	require'closing-context'.write_context(M.config)
 end
 
