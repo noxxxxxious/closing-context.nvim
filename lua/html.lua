@@ -44,7 +44,6 @@ html.context = function(opts, bufnr)
 	for _, html_node in tag_with_attributes_query:iter_matches(root, bufnr, 0, -1) do
 		local start_tag_range = {html_node[1]:range()}
 		local end_tag_range = {html_node[2]:range()}
-		print(vim.inspect(start_tag_range) .. " " .. vim.inspect(end_tag_range))
 		if start_tag_range[3] ~= end_tag_range[3] then
 			-- Get the attributes and format them into a css selector
 			local selector_text = ""
