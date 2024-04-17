@@ -28,6 +28,21 @@ javascript.context = function(opts, bufnr)
 		utils.write_vtext(TYPES.VARIABLE, opts, bufnr, ns_id, variable_delcaration_node[2], keyword, variable_name)
 	end
 
+	-- add context to variable reassignments
+	local query = vim.treesitter.query.parse('javascript', [[
+		(expression_statement
+			(assignment_expression
+				left: (identifier) @variable_name
+			)
+		) @expression_statement
+	]])
+
+	for _, variable_delcaration_node in query:iter_matches(root, bufnr, 0, -1) do
+		local keyword = get_text(variable_delcaration_node[2])
+		local variable_name = get_text(variable_delcaration_node[1])
+		utils.write_vtext(TYPES.VARIABLE, opts, bufnr, ns_id, variable_delcaration_node[2], "asgn", variable_name)
+	end
+
 	-- function declaration
 	query = vim.treesitter.query.parse('javascript', [[
 		(function_declaration
